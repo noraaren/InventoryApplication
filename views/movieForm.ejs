@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title><%= title %></title>
+  <style>
+    :root{
+      --bg: #0f1115;
+      --card: #151923;
+      --muted: #8a94a6;
+      --text: #e8ecf3;
+      --accent: #5b9cff;
+      --accent-2: #7ee787;
+      --danger: #ff6b6b;
+      --border: #232a36;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius-xl: 16px;
+      --radius-lg: 12px;
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body{
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 10% 0%, #0b0d12, var(--bg));
+      color: var(--text);
+      display: grid;
+      place-items: start center;
+      padding: 48px 16px 96px;
+    }
+    .container{
+      width: 100%;
+      max-width: 900px;
+    }
+    h1{
+      margin: 0 0 18px;
+      font-size: clamp(24px, 3vw, 34px);
+      letter-spacing: .3px;
+    }
+    .subtitle{
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-header{
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .pill{
+      font-size: 12px;
+      color: var(--accent-2);
+      background: rgba(126,231,135,.12);
+      padding: 6px 10px;
+      border: 1px solid rgba(126,231,135,.25);
+      border-radius: 999px;
+    }
+    .card-body{
+      padding: 22px;
+    }
+    .grid{
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    @media (min-width: 760px){
+      .grid-2 { grid-template-columns: 1.2fr 1fr; }
+      .grid-inline { grid-template-columns: repeat(2, 1fr); }
+    }
+    label{
+      font-size: 13px;
+      color: var(--muted);
+      display: inline-block;
+      margin-bottom: 8px;
+      letter-spacing: .2px;
+    }
+    .input, textarea, select{
+      width: 100%;
+      background: #0e1320;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      outline: none;
+      transition: border .2s, box-shadow .2s, transform .02s;
+    }
+    .input:focus, textarea:focus, select:focus{
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(91,156,255,.15);
+    }
+    textarea{
+      min-height: 120px;
+      resize: vertical;
+      line-height: 1.4;
+    }
+    .row{
+      display: grid;
+      gap: 10px;
+    }
+    .help{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .errors{
+      border: 1px solid rgba(255,107,107,.35);
+      background: rgba(255,107,107,.08);
+      color: #ffd1d1;
+      border-radius: var(--radius-lg);
+      padding: 14px 16px;
+      margin-bottom: 18px;
+    }
+    .errors ul{ margin: 8px 0 0 18px; }
+    .preview{
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-lg);
+      background: #0d121d;
+      display: grid;
+      place-items: center;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+    }
+    .preview img{
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .actions{
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+      margin-top: 6px;
+    }
+    .btn{
+      appearance: none;
+      border: 1px solid var(--border);
+      background: #0e1320;
+      color: var(--text);
+      padding: 11px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform .02s, border .2s, box-shadow .2s, background .2s;
+    }
+    .btn:hover{ border-color: #2d3546; }
+    .btn:active{ transform: translateY(1px); }
+    .btn-primary{
+      background: linear-gradient(180deg, #2b62ff, #2149c9);
+      border-color: #1e43b8;
+      color: white;
+      box-shadow: 0 8px 20px rgba(43,98,255,.25);
+    }
+    .btn-primary:hover{ filter: brightness(1.03); }
+    .badge{
+      font-size: 12px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 4px 8px;
+      border-radius: 999px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><%= title %></h1>
+    <p class="subtitle">Add a movie to your inventory. Paste an image URL to preview the artwork instantly.</p>
+
+    <% const fd = (typeof formData !== 'undefined' && formData) ? formData : {}; %>
+
+    <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+      <div class="errors">
+        <strong>We found <%= errors.length %> issue<%= errors.length>1 ? 's' : '' %>:</strong>
+        <ul>
+          <% errors.forEach(function(error) { %>
+            <li><%= error %></li>
+          <% }); %>
+        </ul>
+      </div>
+    <% } %>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="pill">Movies</span>
+        <span class="badge">POST</span>
+        <span class="help">/submit-form</span>
+      </div>
+
+      <div class="card-body">
+        <form action="/submit-form" method="POST" novalidate>
+          <div class="grid grid-2">
+            <!-- Left: fields -->
+            <div class="grid" style="gap: 16px;">
+              <div class="row">
+                <label for="title">Title</label>
+                <input class="input" type="text" id="title" name="title" required
+                       placeholder="e.g., Inception"
+                       value="<%= fd.title || '' %>">
+                <div class="help">Required</div>
+              </div>
+
+              <div class="row">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" placeholder="Short synopsis..."><%= fd.description || '' %></textarea>
+              </div>
+
+              <div class="row">
+                <label for="image">Image URL</label>
+                <input class="input" type="url" id="image" name="image"
+                       placeholder="https://…"
+                       value="<%= fd.image || '' %>">
+                <div class="help">Paste a poster URL to see a live preview.</div>
+              </div>
+
+              <div class="grid grid-inline">
+                <div class="row">
+                  <label for="genre">Genre</label>
+                  <input class="input" type="text" id="genre" name="genre"
+                         placeholder="Action, Sci-Fi"
+                         value="<%= fd.genre || '' %>">
+                </div>
+
+                <div class="row">
+                  <label for="year">Year</label>
+                  <input class="input" type="number" id="year" name="year"
+                         min="1888" max="2100" placeholder="2010"
+                         value="<%= fd.year || '' %>">
+                </div>
+              </div>
+
+              <div class="grid grid-inline">
+                <div class="row">
+                  <label for="rating">Rating</label>
+                  <input class="input" type="number" id="rating" name="rating"
+                         step="0.1" min="0" max="10" placeholder="8.4"
+                         value="<%= fd.rating || '' %>">
+                  <div class="help">0–10, decimals allowed.</div>
+                </div>
+
+                <div class="row">
+                  <label for="actors">Actors (comma-separated)</label>
+                  <input class="input" type="text" id="actors" name="actors"
+                         placeholder="Leonardo DiCaprio, Marion Cotillard, Tom Hardy"
+                         value="<%= fd.actors || '' %>">
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: image preview -->
+            <div>
+              <label>Poster Preview</label>
+              <div class="preview" id="posterPreview">
+                <% if (fd.image) { %>
+                  <img src="<%= fd.image %>" alt="Poster preview" onerror="this.closest('.preview').innerHTML='Image failed to load';"/>
+                <% } else { %>
+                  <span class="help">Your poster will appear here.</span>
+                <% } %>
+              </div>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="reset" class="btn" id="resetBtn">Reset</button>
+            <button type="submit" class="btn btn-primary">Save Movie</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Live image preview
+    const imgInput = document.getElementById('image');
+    const preview = document.getElementById('posterPreview');
+
+    function setPreview(url){
+      if(!url){
+        preview.innerHTML = '<span class="help">Your poster will appear here.</span>';
+        return;
+      }
+      const img = new Image();
+      img.alt = 'Poster preview';
+      img.onload = () => {
+        preview.innerHTML = '';
+        preview.appendChild(img);
+      };
+      img.onerror = () => {
+        preview.innerHTML = 'Image failed to load';
+      };
+      img.src = url;
+    }
+
+    imgInput?.addEventListener('input', (e) => {
+      setPreview(e.target.value.trim());
+    });
+
+    // Reset preview on form reset
+    document.getElementById('resetBtn')?.addEventListener('click', () => {
+      setTimeout(() => setPreview(''), 0);
+    });
+  </script>
+</body>
+</html>
