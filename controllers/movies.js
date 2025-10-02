@@ -6,17 +6,14 @@ async function getAllMovies(){
         console.log(movies); 
         return movies;
     }catch(error){
-        console.log("Failed to get messages", error);
+        console.log("Failed to get movies", error);
         throw error;
     }
-
 }
 
 async function insertMovie(req, res){
     try{
         const{title, description, image, genre, actors, year, rating} = req.body;
-        
-        // Process the form data for database
         const movie = {
             title,
             description,
@@ -36,7 +33,20 @@ async function insertMovie(req, res){
 }
 
 
+async function deleteMovie(req, res){
+    try{
+        const {MovieID} = req.body;
+        await db.deleteMovie({MovieID});  // Pass as object: {MovieID: "123"}
+        return res.redirect('/');
+    }catch(error){ 
+        console.error("Failed to delete movie", error)
+        return res.status(500).send("Failed to delete movie")
+    }
+}
+
+
 module.exports = { 
     getAllMovies,
     insertMovie,
+    deleteMovie,
 }

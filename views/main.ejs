@@ -175,6 +175,25 @@
       color: var(--text);
     }
     
+    .btn-delete {
+      background: #dc2626;
+      color: white;
+      border: 1px solid #b91c1c;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background .2s, transform .02s;
+    }
+    
+    .btn-delete:hover {
+      background: #b91c1c;
+    }
+    
+    .btn-delete:active {
+      transform: translateY(1px);
+    }
+    
     .empty-state {
       text-align: center;
       padding: 80px 20px;
@@ -194,7 +213,10 @@
         <h1>Movie Inventory</h1>
         <p class="subtitle">Your personal movie collection</p>
       </div>
-      <a href="/movies/new" class="btn">+ Add Movie</a>
+      <div style="display: flex; gap: 12px;">
+        <a href="/delete-movie" class="btn" style="background: #dc2626; border-color: #b91c1c;">🗑️ Delete Movie</a>
+        <a href="/movies/new" class="btn">+ Add Movie</a>
+      </div>
     </div>
     
     <% if (movies && movies.length > 0) { %>
@@ -247,15 +269,23 @@
   </div>
 
   <script>
-    // Add Movie button click handler
-    const addMovieButtons = document.querySelectorAll('.btn');
+    // Button click handlers
+    const addMovieButton = document.querySelector('a[href="/movies/new"]');
+    const deleteMovieButton = document.querySelector('a[href="/delete-movie"]');
     
-    addMovieButtons.forEach(button => {
-      button.addEventListener('click', function(e) {
+    if (addMovieButton) {
+      addMovieButton.addEventListener('click', function(e) {
         e.preventDefault();
         window.location.href = '/movies/new';
       });
-    });
+    }
+    
+    if (deleteMovieButton) {
+      deleteMovieButton.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = '/delete-movie';
+      });
+    }
   </script>
 </body>
 </html>

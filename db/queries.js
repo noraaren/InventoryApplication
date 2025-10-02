@@ -16,7 +16,19 @@ async function insertMovie(movie){
     return rows[0];
 }
 
+async function deleteMovie(movie){
+    const {MovieID} = movie;
+    const query = `
+        DELETE FROM movies WHERE MovieID = $1
+        RETURNING *
+    `;
+    const values = [MovieID];
+    const {rows} = await pool.query(query, values);
+    return rows[0];
+}
+
 module.exports = {
     getMovies,
     insertMovie,
+    deleteMovie,
 }
